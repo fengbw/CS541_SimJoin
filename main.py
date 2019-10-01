@@ -32,8 +32,8 @@ if __name__ == "__main__":
 
     dat = ReadDataFromFile(filename)
     output = SimilarityJoinED(dat,edtau)
-    WriteResults(output)
-       
+    ## WriteResults(output)
+
     ## Test Case1: Check number of matched pairs (In bash)
     ## Manually run `wc -l answer.csv` & `wc -l out.csv` to check if number matches.
 
@@ -42,4 +42,3 @@ if __name__ == "__main__":
 
     ## Note for `diff`: Since different OS use different symbol for newline, for your own testing phase,
     ##                  you might want to use `dos2unix` to transfer windows newlines into unix type before using `diff`
-
