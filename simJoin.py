@@ -71,6 +71,9 @@ def doCompare(index1, index2, string1, string2, threshold, delta):
     #     if ed <= threshold:
     #         return [index1, index2, ed]
     return
+    # ed = Verification(string1, string2, threshold)
+    # if ed <= threshold:
+    #     return [index1, index2, ed]
 
 def doPartition(dat, threshold):
     global partition_dict
@@ -99,23 +102,29 @@ def doPartition(dat, threshold):
 
 def doSelection(string1, string2, threshold, delta, partition_index):
     # print(string1, partition_index)
-    substrings = []
+    # substrings = []
     index_number = len(partition_index)
-    for i in range(index_number):
-        if i == index_number - 1:
-            substrings.append(string1[partition_index[i]:])
-            continue
-        substrings.append(string1[partition_index[i]:partition_index[i + 1]])
+    # for i in range(index_number):
+    #     if i == index_number - 1:
+    #         substrings.append(string1[partition_index[i]:])
+    #         continue
+    #     substrings.append(string1[partition_index[i]:partition_index[i + 1]])
     # print(substrings)
     for i, position in enumerate(partition_index):
         leftBound = max(position - (i + 1 - 1), position + delta - (threshold + 1 - i - 1))
         rightBound = min(position + (i + 1 - 1), position + delta + (threshold + 1 - i - 1))
         # print(leftBound, rightBound)
-        selectionLength = len(substrings[i])
+        # selectionLength = len(substrings[i])
         selections = []
         for j in range(leftBound, rightBound + 1):
+            if i == index_number - 1:
+                substring = string1[partition_index[i]:]
+            else:
+                substring = string1[partition_index[i]:partition_index[i + 1]]
+            selectionLength = len(substring)
             selection = string2[j:j + selectionLength]
-            if substrings[i] == selection:
+            # if substrings[i] == selection:
+            if substring == selection:
                 global substring_index, r_position, s_position, substring_length
                 substring_index, r_position, s_position, substring_length = i + 1, position, j, selectionLength
                 return True
