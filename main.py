@@ -27,12 +27,12 @@ def WriteResults(dat):
 
 
 if __name__ == "__main__":
-    filename = "./testset/sample_test1.txt"		## Input file path (Can be modified while you are testing code)
-    edtau = 2		## Threshold:tau (Can be modified while you are testing code)
+    filename = "./testset/sample_test3.txt"		## Input file path (Can be modified while you are testing code)
+    edtau = 1		## Threshold:tau (Can be modified while you are testing code)
 
     dat = ReadDataFromFile(filename)
     output = SimilarityJoinED(dat,edtau)
-    ## WriteResults(output)
+    WriteResults(output)
 
     ## Test Case1: Check number of matched pairs (In bash)
     ## Manually run `wc -l answer.csv` & `wc -l out.csv` to check if number matches.

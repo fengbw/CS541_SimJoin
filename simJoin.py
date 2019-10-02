@@ -32,19 +32,25 @@ def SimilarityJoinED(dat, threshold):
             delta = abs(len(dat[i]) - len(dat[j]))
             if delta > threshold:
                 continue
-            result = doCompare(dat[i], dat[j], threshold, delta)
-            output.append(result)
-
+            result = doCompare(i, j, dat[i], dat[j], threshold, delta)
+            if result is not None:
+                output.append(result)
+    print(output)
     return output
 
-def doCompare(string1, string2, threshold, delta):
+def doCompare(index1, index2, string1, string2, threshold, delta):
+    if len(string1) > len(string2):
+        string1, string2 = string2, string1
     partition_index = doPartition(string1, threshold)
-    print(partition_index)
+    doVerification = doSelection(string1, string2, threshold, delta, partition_index)
+    if doVerification:
+        ed = Verification(string1, string2, threshold)
+        if ed <= threshold:
+            return [index1, index2, ed]
     return
 
 def doPartition(dat, threshold):
     global partition_dict
-    print(partition_dict)
     len1 = len(dat)
     if len1 in partition_dict:
         return partition_dict[len1]
@@ -55,7 +61,7 @@ def doPartition(dat, threshold):
     index = 0
     if segement_more == 0:
         for i in range(segement_number):
-            paritition_index.append(index)
+            partition_index.append(index)
             index += segement_base
     else:
         base_number = segement_number - segement_more
@@ -67,3 +73,47 @@ def doPartition(dat, threshold):
             index += segement_base + 1
     partition_dict[len1] = partition_index
     return partition_index
+
+def doSelection(string1, string2, threshold, delta, partition_index):
+    # print(string1, partition_index)
+    substrings = []
+    index_number = len(partition_index)
+    for i in range(index_number):
+        if i == index_number - 1:
+            substrings.append(string1[partition_index[i]:])
+            continue
+        substrings.append(string1[partition_index[i]:partition_index[i + 1]])
+    # print(substrings)
+    for i, position in enumerate(partition_index):
+        leftBound = max(position - (i + 1 - 1), position + delta - (threshold + 1 - i - 1))
+        rightBound = min(position + (i + 1 - 1), position + delta + (threshold + 1 - i - 1))
+        # print(leftBound, rightBound)
+        selectionLength = len(substrings[i])
+        selections = []
+        for j in range(leftBound, rightBound + 1):
+            selections.append(string2[j:j + selectionLength])
+        # print(selections)
+        if substrings[i] in selections:
+            return True
+    return False
+
+def Verification(string1, string2, threshold):
+    len1 = len(string1)
+    len2 = len(string2)
+    matrix = [[float("inf") for i in range(len1 + 1)] for j in range(len2 + 1)]
+    for i in range(len1 + 1):
+        matrix[0][i] = i
+    for j in range(len2 + 1):
+        matrix[j][0] = j
+    for i in range(1, len2 + 1):
+        for j in range(1, len1 + 1):
+            if abs(i - j) > threshold:
+                continue
+            if string1[j - 1] == string2[i - 1]:
+                cost = 0
+            else:
+                cost = 1
+            matrix[i][j] = min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + cost)
+    # print(matrix)
+    # print("---------------")
+    return matrix[len2][len1]
