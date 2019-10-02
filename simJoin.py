@@ -7,6 +7,7 @@
     to modify the function name and parameters
 """
 partition_dict = {}
+substring_index = r_position = s_position = substring_length = 0
 
 def SimilarityJoinED(dat, threshold):
     """
@@ -35,7 +36,7 @@ def SimilarityJoinED(dat, threshold):
             result = doCompare(i, j, dat[i], dat[j], threshold, delta)
             if result is not None:
                 output.append(result)
-    print(output)
+    # print(output)
     return output
 
 def doCompare(index1, index2, string1, string2, threshold, delta):
@@ -44,9 +45,31 @@ def doCompare(index1, index2, string1, string2, threshold, delta):
     partition_index = doPartition(string1, threshold)
     doVerification = doSelection(string1, string2, threshold, delta, partition_index)
     if doVerification:
-        ed = Verification(string1, string2, threshold)
-        if ed <= threshold:
-            return [index1, index2, ed]
+        global substring_index, r_position, s_position, substring_length
+        r_left, r_right = string1[:r_position], string1[r_position + substring_length:]
+        s_left, s_right = string2[:s_position], string2[s_position + substring_length:]
+        if r_left == "":
+            ed = Verification(r_right, s_right, threshold)
+            if ed <= threshold:
+                return [index1, index2, ed]
+        if r_right == "" or r_right == s_right:
+            ed = Verification(r_left, s_left, threshold)
+            if ed <= threshold:
+                return [index1, index2, ed]
+        # special case: so_jin_kang sinjun_kang
+        threshold_left = substring_index - 1
+        threshold_right = threshold + 1 - substring_index
+        ed_left = Verification(r_left, s_left, threshold_left)
+        if ed_left > threshold_left:
+            return
+        ed_right = Verification(r_right, s_right, threshold_right)
+        if ed_right > threshold_right:
+            return
+        return [index1, index2, ed_left + ed_right]
+    # if doVerification:
+    #     ed = Verification(string1, string2, threshold)
+    #     if ed <= threshold:
+    #         return [index1, index2, ed]
     return
 
 def doPartition(dat, threshold):
@@ -91,10 +114,15 @@ def doSelection(string1, string2, threshold, delta, partition_index):
         selectionLength = len(substrings[i])
         selections = []
         for j in range(leftBound, rightBound + 1):
-            selections.append(string2[j:j + selectionLength])
+            selection = string2[j:j + selectionLength]
+            if substrings[i] == selection:
+                global substring_index, r_position, s_position, substring_length
+                substring_index, r_position, s_position, substring_length = i + 1, position, j, selectionLength
+                return True
+            # selections.append(string2[j:j + selectionLength])
         # print(selections)
-        if substrings[i] in selections:
-            return True
+        # if substrings[i] in selections:
+        #     return True
     return False
 
 def Verification(string1, string2, threshold):

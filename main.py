@@ -5,6 +5,7 @@
     Main file
 """
 import csv
+import time
 from simJoin import SimilarityJoinED
 
 """
@@ -31,7 +32,10 @@ if __name__ == "__main__":
     edtau = 1		## Threshold:tau (Can be modified while you are testing code)
 
     dat = ReadDataFromFile(filename)
+    start = time.time()
     output = SimilarityJoinED(dat,edtau)
+    end = time.time()
+    print(end - start)
     WriteResults(output)
 
     ## Test Case1: Check number of matched pairs (In bash)
