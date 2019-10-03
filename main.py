@@ -28,16 +28,14 @@ def WriteResults(dat):
 
 
 if __name__ == "__main__":
+    start = time.time()
     filename = "./testset/sample_test3.txt"		## Input file path (Can be modified while you are testing code)
     edtau = 1		## Threshold:tau (Can be modified while you are testing code)
 
     dat = ReadDataFromFile(filename)
-    start = time.time()
     output = SimilarityJoinED(dat,edtau)
-    end = time.time()
-    print(end - start)
     WriteResults(output)
-
+    print("Running time", time.time() - start)
     ## Test Case1: Check number of matched pairs (In bash)
     ## Manually run `wc -l answer.csv` & `wc -l out.csv` to check if number matches.
 

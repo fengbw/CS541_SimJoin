@@ -49,31 +49,26 @@ def doCompare(index1, index2, string1, string2, threshold, delta):
         r_left, r_right = string1[:r_position], string1[r_position + substring_length:]
         s_left, s_right = string2[:s_position], string2[s_position + substring_length:]
         if r_left == "":
-            ed = Verification(r_right, s_right, threshold)
+            ed = Verification(r_right, s_right, threshold, delta)
             if ed <= threshold:
                 return [index1, index2, ed]
+            return
         if r_right == "" or r_right == s_right:
-            ed = Verification(r_left, s_left, threshold)
+            ed = Verification(r_left, s_left, threshold, delta)
             if ed <= threshold:
                 return [index1, index2, ed]
+            return
         # special case: so_jin_kang sinjun_kang
         threshold_left = substring_index - 1
         threshold_right = threshold + 1 - substring_index
-        ed_left = Verification(r_left, s_left, threshold_left)
+        ed_left = Verification(r_left, s_left, threshold_left, delta)
         if ed_left > threshold_left:
             return
-        ed_right = Verification(r_right, s_right, threshold_right)
+        ed_right = Verification(r_right, s_right, threshold_right, delta)
         if ed_right > threshold_right:
             return
         return [index1, index2, ed_left + ed_right]
-    # if doVerification:
-    #     ed = Verification(string1, string2, threshold)
-    #     if ed <= threshold:
-    #         return [index1, index2, ed]
     return
-    # ed = Verification(string1, string2, threshold)
-    # if ed <= threshold:
-    #     return [index1, index2, ed]
 
 def doPartition(dat, threshold):
     global partition_dict
@@ -115,7 +110,7 @@ def doSelection(string1, string2, threshold, delta, partition_index):
         rightBound = min(position + (i + 1 - 1), position + delta + (threshold + 1 - i - 1))
         # print(leftBound, rightBound)
         # selectionLength = len(substrings[i])
-        selections = []
+        # selections = []
         for j in range(leftBound, rightBound + 1):
             if i == index_number - 1:
                 substring = string1[partition_index[i]:]
@@ -134,23 +129,38 @@ def doSelection(string1, string2, threshold, delta, partition_index):
         #     return True
     return False
 
-def Verification(string1, string2, threshold):
+def Verification(string1, string2, threshold, delta):
     len1 = len(string1)
     len2 = len(string2)
-    matrix = [[float("inf") for i in range(len1 + 1)] for j in range(len2 + 1)]
-    for i in range(len1 + 1):
+    left_limit = (threshold - delta) // 2
+    right_limit = (threshold + delta) // 2
+    matrix = [[float("inf") for i in range(len2 + 1)] for j in range(len1 + 1)]
+    for i in range(len2 + 1):
         matrix[0][i] = i
-    for j in range(len2 + 1):
+    for j in range(len1 + 1):
         matrix[j][0] = j
-    for i in range(1, len2 + 1):
-        for j in range(1, len1 + 1):
-            if abs(i - j) > threshold:
-                continue
-            if string1[j - 1] == string2[i - 1]:
+    for i in range(1, len1 + 1):
+        counter = 0
+        left_bound = i - left_limit if i - left_limit >= 1 else 1
+        right_bound = i + right_limit + 1 if i + right_limit + 1 <= len2 + 1 else len2 + 1
+        for j in range(left_bound, right_bound):
+            if string1[i - 1] == string2[j - 1]:
                 cost = 0
             else:
                 cost = 1
             matrix[i][j] = min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + cost)
-    # print(matrix)
+            if matrix[i][j] > threshold:
+                counter += 1
+        if counter == left_limit + right_limit + 1:
+            return float("inf")
+    # for item in matrix:
+    #     print(item)
     # print("---------------")
-    return matrix[len2][len1]
+    return matrix[len1][len2]
+
+# if __name__ == "__main__":
+#     string1 = "injun_kang"
+#     string2 = "so_jin_kang"
+#     threshold = 1
+#     delta = 1
+#     Verification(string1, string2, threshold, delta)
